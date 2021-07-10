@@ -1,0 +1,4 @@
+# created by virtualenv automatically
+nova/
+__pycache__/
+flask_session/
