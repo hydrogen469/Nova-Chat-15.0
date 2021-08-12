@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for
-from flask_login import LoginManager, login_user, current_user, login_required. logout_user
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from wtform_fields import *
 
 from models import *
@@ -32,6 +32,8 @@ def index():
       user = User(username=username, password=hashed_pswd)
       db.session.add(user)
       db.session.commit()
+
+      flash('Registered into Nova Chat. Please log in.', 'success')
       return redirect(url_for('login'))
 
   return render_template("index.html", form=reg_form)
@@ -43,23 +45,22 @@ def login():
     user_object = User.query.filter_by(username=login_form.username.data).first()
     login_user(user_object)
     return redirect(url_for('chat'))
-
-
-
-return render_template("login.html", form=login_form)
+    return render_template("login.html", form=login_form)
 
 @app.route("/chat", methods=['GET', 'POST'])
 @login_required
 def chat():
   if not current_user.is_authenticated:
-      return "Please log in."
+      flash('Please log in.', 'danger')
+      return redirect(url_for('login'))
 
   return "Chat with Stars"
 
 @app.route("/logout", methods=['GET'])
 def logout():
   logout_user()
-  return "Logged out successfully!"
+  flash('Logged out successfully!', 'success')
+  return redirect(url_for('login'))
 
 if __name__ == "__main__":
   app.run(debug=True)
